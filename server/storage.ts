@@ -1,9 +1,10 @@
 import { 
-  users, posts, portfolioWorks, follows, likes, comments,
+  users, posts, portfolioWorks, follows, likes, comments, conversations, messages,
   type User, type InsertUser, type Post, type InsertPost,
   type PortfolioWork, type InsertPortfolioWork, type Follow, type InsertFollow,
   type Like, type InsertLike, type Comment, type InsertComment,
-  type PostWithUser, type CommentWithUser
+  type Conversation, type InsertConversation, type Message, type InsertMessage,
+  type PostWithUser, type CommentWithUser, type ConversationWithParticipants, type MessageWithSender
 } from "@shared/schema";
 
 export interface IStorage {
@@ -50,6 +51,18 @@ export interface IStorage {
   getCommentsByPost(postId: number): Promise<CommentWithUser[]>;
   createComment(comment: InsertComment): Promise<Comment>;
   deleteComment(id: number): Promise<boolean>;
+
+  // Messaging operations
+  getConversation(id: number): Promise<ConversationWithParticipants | undefined>;
+  getConversationByParticipants(participant1Id: number, participant2Id: number): Promise<ConversationWithParticipants | undefined>;
+  getUserConversations(userId: number): Promise<ConversationWithParticipants[]>;
+  createConversation(conversation: InsertConversation): Promise<Conversation>;
+  updateConversationLastMessage(conversationId: number): Promise<void>;
+
+  getMessagesByConversation(conversationId: number, limit?: number): Promise<MessageWithSender[]>;
+  createMessage(message: InsertMessage): Promise<Message>;
+  markMessagesAsRead(conversationId: number, userId: number): Promise<void>;
+  getUnreadMessageCount(conversationId: number, userId: number): Promise<number>;
 }
 
 export class MemStorage implements IStorage {
@@ -59,6 +72,8 @@ export class MemStorage implements IStorage {
   private follows: Map<number, Follow> = new Map();
   private likes: Map<number, Like> = new Map();
   private comments: Map<number, Comment> = new Map();
+  private conversations: Map<number, Conversation> = new Map();
+  private messages: Map<number, Message> = new Map();
   
   private currentUserId = 1;
   private currentPostId = 1;
@@ -66,6 +81,8 @@ export class MemStorage implements IStorage {
   private currentFollowId = 1;
   private currentLikeId = 1;
   private currentCommentId = 1;
+  private currentConversationId = 1;
+  private currentMessageId = 1;
 
   constructor() {
     this.initializeSampleData();
@@ -278,6 +295,44 @@ export class MemStorage implements IStorage {
         createdAt: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000),
       };
       this.comments.set(comment.id, comment);
+    });
+
+    // Create some conversations
+    const conversations = [
+      { participant1Id: 1, participant2Id: 2 },
+      { participant1Id: 1, participant2Id: 3 },
+      { participant1Id: 2, participant2Id: 3 },
+    ];
+
+    conversations.forEach(conversationData => {
+      const conversation: Conversation = {
+        id: this.currentConversationId++,
+        ...conversationData,
+        createdAt: new Date(),
+        lastMessageAt: new Date(),
+      };
+      this.conversations.set(conversation.id, conversation);
+    });
+
+    // Create some messages
+    const messages = [
+      { conversationId: 1, senderId: 1, content: "Edgar, I've been thinking about our discussion on Gothic literature. Your perspective on melancholy is fascinating!" },
+      { conversationId: 1, senderId: 2, content: "Jane, your insight into the human condition never ceases to amaze me. Perhaps we should collaborate on a piece exploring the darker aspects of romance?" },
+      { conversationId: 1, senderId: 1, content: "What a delightful idea! I believe combining our styles could create something truly unique." },
+      { conversationId: 2, senderId: 3, content: "Jane, your latest post about finding one's voice resonated deeply with me. As someone who has fought for justice through words, I appreciate your message." },
+      { conversationId: 2, senderId: 1, content: "Maya, your work has always been an inspiration to me. The way you weave social justice into your poetry is masterful." },
+      { conversationId: 3, senderId: 2, content: "Maya, I find myself drawn to your use of metaphor in addressing social issues. Could we perhaps discuss techniques for impactful imagery?" },
+      { conversationId: 3, senderId: 3, content: "Edgar, I would be honored to share thoughts with you. Your mastery of atmosphere and mood could greatly enhance social commentary." },
+    ];
+
+    messages.forEach(messageData => {
+      const message: Message = {
+        id: this.currentMessageId++,
+        ...messageData,
+        createdAt: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000),
+        isRead: Math.random() > 0.5,
+      };
+      this.messages.set(message.id, message);
     });
 
     // Update post counts to reflect actual likes and comments
@@ -654,6 +709,143 @@ export class MemStorage implements IStorage {
     }
     
     return true;
+  }
+
+  // Messaging operations
+  async getConversation(id: number): Promise<ConversationWithParticipants | undefined> {
+    const conversation = this.conversations.get(id);
+    if (!conversation) return undefined;
+
+    const participant1 = await this.getUser(conversation.participant1Id);
+    const participant2 = await this.getUser(conversation.participant2Id);
+    
+    if (!participant1 || !participant2) return undefined;
+
+    // Get last message
+    const messages = Array.from(this.messages.values())
+      .filter(msg => msg.conversationId === id)
+      .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+    
+    const lastMessage = messages[0];
+
+    return {
+      ...conversation,
+      participant1,
+      participant2,
+      lastMessage,
+    };
+  }
+
+  async getConversationByParticipants(participant1Id: number, participant2Id: number): Promise<ConversationWithParticipants | undefined> {
+    const conversation = Array.from(this.conversations.values()).find(conv => 
+      (conv.participant1Id === participant1Id && conv.participant2Id === participant2Id) ||
+      (conv.participant1Id === participant2Id && conv.participant2Id === participant1Id)
+    );
+
+    if (!conversation) return undefined;
+
+    return this.getConversation(conversation.id);
+  }
+
+  async getUserConversations(userId: number): Promise<ConversationWithParticipants[]> {
+    const userConversations = Array.from(this.conversations.values())
+      .filter(conv => conv.participant1Id === userId || conv.participant2Id === userId)
+      .sort((a, b) => new Date(b.lastMessageAt!).getTime() - new Date(a.lastMessageAt!).getTime());
+
+    const result: ConversationWithParticipants[] = [];
+    
+    for (const conv of userConversations) {
+      const fullConversation = await this.getConversation(conv.id);
+      if (fullConversation) {
+        // Add unread count
+        const unreadCount = await this.getUnreadMessageCount(conv.id, userId);
+        fullConversation.unreadCount = unreadCount;
+        result.push(fullConversation);
+      }
+    }
+
+    return result;
+  }
+
+  async createConversation(insertConversation: InsertConversation): Promise<Conversation> {
+    const conversation: Conversation = {
+      id: this.currentConversationId++,
+      participant1Id: insertConversation.participant1Id,
+      participant2Id: insertConversation.participant2Id,
+      lastMessageAt: new Date(),
+      createdAt: new Date(),
+    };
+
+    this.conversations.set(conversation.id, conversation);
+    return conversation;
+  }
+
+  async updateConversationLastMessage(conversationId: number): Promise<void> {
+    const conversation = this.conversations.get(conversationId);
+    if (conversation) {
+      conversation.lastMessageAt = new Date();
+      this.conversations.set(conversationId, conversation);
+    }
+  }
+
+  async getMessagesByConversation(conversationId: number, limit = 50): Promise<MessageWithSender[]> {
+    const messages = Array.from(this.messages.values())
+      .filter(msg => msg.conversationId === conversationId)
+      .sort((a, b) => new Date(a.createdAt!).getTime() - new Date(b.createdAt!).getTime())
+      .slice(-limit);
+
+    const result: MessageWithSender[] = [];
+    
+    for (const message of messages) {
+      const sender = await this.getUser(message.senderId);
+      if (sender) {
+        result.push({
+          ...message,
+          sender,
+        });
+      }
+    }
+
+    return result;
+  }
+
+  async createMessage(insertMessage: InsertMessage): Promise<Message> {
+    const message: Message = {
+      id: this.currentMessageId++,
+      conversationId: insertMessage.conversationId,
+      senderId: insertMessage.senderId,
+      content: insertMessage.content,
+      isRead: false,
+      createdAt: new Date(),
+    };
+
+    this.messages.set(message.id, message);
+    
+    // Update conversation last message time
+    await this.updateConversationLastMessage(message.conversationId);
+    
+    return message;
+  }
+
+  async markMessagesAsRead(conversationId: number, userId: number): Promise<void> {
+    const messages = Array.from(this.messages.values())
+      .filter(msg => msg.conversationId === conversationId && msg.senderId !== userId);
+
+    for (const message of messages) {
+      message.isRead = true;
+      this.messages.set(message.id, message);
+    }
+  }
+
+  async getUnreadMessageCount(conversationId: number, userId: number): Promise<number> {
+    const unreadMessages = Array.from(this.messages.values())
+      .filter(msg => 
+        msg.conversationId === conversationId && 
+        msg.senderId !== userId && 
+        !msg.isRead
+      );
+
+    return unreadMessages.length;
   }
 }
 

@@ -3,7 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { 
   insertUserSchema, insertPostSchema, insertPortfolioWorkSchema, 
-  insertFollowSchema, insertLikeSchema, insertCommentSchema 
+  insertFollowSchema, insertLikeSchema, insertCommentSchema,
+  insertConversationSchema, insertMessageSchema
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -345,6 +346,103 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Comment not found" });
       }
       res.json({ message: "Comment deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Messaging routes
+  app.get("/api/conversations", async (req, res) => {
+    try {
+      const userId = parseInt(req.query.userId as string);
+      if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
+      }
+      const conversations = await storage.getUserConversations(userId);
+      res.json(conversations);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/conversations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const conversation = await storage.getConversation(id);
+      if (!conversation) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+      res.json(conversation);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/conversations", async (req, res) => {
+    try {
+      const conversationData = insertConversationSchema.parse(req.body);
+      
+      // Check if conversation already exists
+      const existingConversation = await storage.getConversationByParticipants(
+        conversationData.participant1Id, 
+        conversationData.participant2Id
+      );
+      
+      if (existingConversation) {
+        return res.json(existingConversation);
+      }
+      
+      const conversation = await storage.createConversation(conversationData);
+      const fullConversation = await storage.getConversation(conversation.id);
+      res.status(201).json(fullConversation);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid conversation data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/conversations/:id/messages", async (req, res) => {
+    try {
+      const conversationId = parseInt(req.params.id);
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      const messages = await storage.getMessagesByConversation(conversationId, limit);
+      res.json(messages);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/conversations/:id/messages", async (req, res) => {
+    try {
+      const conversationId = parseInt(req.params.id);
+      const messageData = insertMessageSchema.parse({
+        ...req.body,
+        conversationId
+      });
+      
+      const message = await storage.createMessage(messageData);
+      res.status(201).json(message);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid message data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/conversations/:id/read", async (req, res) => {
+    try {
+      const conversationId = parseInt(req.params.id);
+      const userId = parseInt(req.body.userId);
+      
+      if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
+      }
+      
+      await storage.markMessagesAsRead(conversationId, userId);
+      res.json({ message: "Messages marked as read" });
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }

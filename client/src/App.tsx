@@ -10,6 +10,7 @@ import Home from "@/pages/home";
 import Portfolio from "@/pages/portfolio";
 import Profile from "@/pages/profile";
 import Write from "@/pages/write";
+import Messages from "@/pages/messages";
 import Accessibility from "@/pages/accessibility";
 import Header from "@/components/header";
 
@@ -23,6 +24,7 @@ function Router() {
           <Route path="/portfolio" component={Portfolio} />
           <Route path="/profile/:id?" component={Profile} />
           <Route path="/write" component={Write} />
+          <Route path="/messages" component={Messages} />
           <Route path="/accessibility" component={Accessibility} />
           <Route component={NotFound} />
         </Switch>

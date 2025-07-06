@@ -66,6 +66,23 @@ export const comments = pgTable("comments", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const conversations = pgTable("conversations", {
+  id: serial("id").primaryKey(),
+  participant1Id: integer("participant1_id").notNull(),
+  participant2Id: integer("participant2_id").notNull(),
+  lastMessageAt: timestamp("last_message_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const messages = pgTable("messages", {
+  id: serial("id").primaryKey(),
+  conversationId: integer("conversation_id").notNull(),
+  senderId: integer("sender_id").notNull(),
+  content: text("content").notNull(),
+  isRead: boolean("is_read").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -104,6 +121,18 @@ export const insertCommentSchema = createInsertSchema(comments).omit({
   createdAt: true,
 });
 
+export const insertConversationSchema = createInsertSchema(conversations).omit({
+  id: true,
+  lastMessageAt: true,
+  createdAt: true,
+});
+
+export const insertMessageSchema = createInsertSchema(messages).omit({
+  id: true,
+  isRead: true,
+  createdAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -131,4 +160,21 @@ export type PostWithUser = Post & {
 
 export type CommentWithUser = Comment & {
   user: User;
+};
+
+export type Conversation = typeof conversations.$inferSelect;
+export type InsertConversation = z.infer<typeof insertConversationSchema>;
+
+export type Message = typeof messages.$inferSelect;
+export type InsertMessage = z.infer<typeof insertMessageSchema>;
+
+export type ConversationWithParticipants = Conversation & {
+  participant1: User;
+  participant2: User;
+  lastMessage?: Message;
+  unreadCount?: number;
+};
+
+export type MessageWithSender = Message & {
+  sender: User;
 };

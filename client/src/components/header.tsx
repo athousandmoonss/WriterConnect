@@ -1,4 +1,4 @@
-import { Search, Home, Users, Bookmark, Bell, Settings } from "lucide-react";
+import { Search, Home, Users, Bookmark, Bell, Settings, MessageCircle } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -50,6 +50,16 @@ export default function Header() {
                 className={`text-ink-600 hover:text-gold-600 ${location === '/' ? 'text-gold-600' : ''}`}
               >
                 <Home className="h-5 w-5" />
+              </Button>
+            </Link>
+            
+            <Link href="/messages">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className={`text-ink-600 hover:text-gold-600 ${location === '/messages' ? 'text-gold-600' : ''}`}
+              >
+                <MessageCircle className="h-5 w-5" />
               </Button>
             </Link>
             

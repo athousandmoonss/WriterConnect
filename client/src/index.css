@@ -125,3 +125,198 @@
   .font-inter { font-family: 'Inter', sans-serif; }
   .font-fira { font-family: 'Fira Code', monospace; }
 }
+
+/* Accessibility Mode Styles */
+.accessibility-enabled {
+  scroll-behavior: smooth;
+  transition: all 0.3s ease;
+}
+
+/* High Contrast Mode */
+.high-contrast {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 0%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 0%;
+  --primary: 0 0% 0%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 90%;
+  --secondary-foreground: 0 0% 0%;
+  --muted: 0 0% 95%;
+  --muted-foreground: 0 0% 0%;
+  --accent: 0 0% 85%;
+  --accent-foreground: 0 0% 0%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 70%;
+  --input: 0 0% 90%;
+  --ring: 0 0% 50%;
+}
+
+.dark.high-contrast {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 0%;
+  --card-foreground: 0 0% 100%;
+  --popover: 0 0% 0%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 0 0% 100%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 0 0% 15%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 0 0% 10%;
+  --muted-foreground: 0 0% 100%;
+  --accent: 0 0% 20%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 30%;
+  --input: 0 0% 15%;
+  --ring: 0 0% 50%;
+}
+
+/* Dyslexia Friendly Mode */
+.dyslexia-friendly {
+  --background: 47 100% 96%;
+  --foreground: 0 0% 9%;
+  --card: 47 100% 98%;
+  --card-foreground: 0 0% 9%;
+  --popover: 47 100% 98%;
+  --popover-foreground: 0 0% 9%;
+  --primary: 210 100% 30%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 0 0% 9%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 0 0% 30%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 0 0% 9%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 210 40% 85%;
+  --input: 210 40% 96%;
+  --ring: 210 100% 30%;
+}
+
+.dyslexia-friendly * {
+  font-family: 'OpenDyslexic', Arial, sans-serif !important;
+  line-height: 1.6 !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* Low Light Mode */
+.low-light {
+  --background: 220 13% 18%;
+  --foreground: 220 9% 85%;
+  --card: 220 13% 16%;
+  --card-foreground: 220 9% 85%;
+  --popover: 220 13% 16%;
+  --popover-foreground: 220 9% 85%;
+  --primary: 142 76% 36%;
+  --primary-foreground: 220 9% 95%;
+  --secondary: 220 13% 25%;
+  --secondary-foreground: 220 9% 85%;
+  --muted: 220 13% 25%;
+  --muted-foreground: 220 9% 65%;
+  --accent: 220 13% 25%;
+  --accent-foreground: 220 9% 85%;
+  --destructive: 0 62% 50%;
+  --destructive-foreground: 220 9% 95%;
+  --border: 220 13% 25%;
+  --input: 220 13% 25%;
+  --ring: 142 76% 36%;
+}
+
+/* Large Text Mode */
+.large-text {
+  font-size: 1.2em !important;
+}
+
+.large-text h1 {
+  font-size: 2.5em !important;
+}
+
+.large-text h2 {
+  font-size: 2em !important;
+}
+
+.large-text h3 {
+  font-size: 1.5em !important;
+}
+
+.large-text p,
+.large-text span,
+.large-text div {
+  font-size: 1.2em !important;
+  line-height: 1.8 !important;
+}
+
+.large-text button {
+  font-size: 1.1em !important;
+  padding: 0.75rem 1.5rem !important;
+}
+
+/* Font Size Classes */
+.accessibility-enabled.font-size-large {
+  font-size: 1.25em;
+}
+
+.accessibility-enabled.font-size-extra-large {
+  font-size: 1.5em;
+}
+
+.accessibility-enabled.font-size-large h1,
+.accessibility-enabled.font-size-extra-large h1 {
+  font-size: 2.5em;
+}
+
+.accessibility-enabled.font-size-large h2,
+.accessibility-enabled.font-size-extra-large h2 {
+  font-size: 2em;
+}
+
+.accessibility-enabled.font-size-large h3,
+.accessibility-enabled.font-size-extra-large h3 {
+  font-size: 1.5em;
+}
+
+/* Focus indicators for accessibility */
+.accessibility-enabled *:focus {
+  outline: 3px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Improve button accessibility */
+.accessibility-enabled button {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Improve link accessibility */
+.accessibility-enabled a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* Improve form accessibility */
+.accessibility-enabled input,
+.accessibility-enabled textarea,
+.accessibility-enabled select {
+  border: 2px solid hsl(var(--border));
+  min-height: 44px;
+}
+
+/* Screen reader only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,4 +1,4 @@
-import { Search, Home, Users, Bookmark, Bell } from "lucide-react";
+import { Search, Home, Users, Bookmark, Bell, Settings } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -64,6 +64,16 @@ export default function Header() {
             <Button variant="ghost" size="sm" className="text-ink-600 hover:text-gold-600">
               <Bell className="h-5 w-5" />
             </Button>
+            
+            <Link href="/accessibility">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className={`text-ink-600 hover:text-gold-600 ${location === '/accessibility' ? 'text-gold-600' : ''}`}
+              >
+                <Settings className="h-5 w-5" />
+              </Button>
+            </Link>
             
             {/* Profile Menu */}
             <Link href="/profile">

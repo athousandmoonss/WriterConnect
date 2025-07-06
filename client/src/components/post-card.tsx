@@ -7,10 +7,13 @@ import {
   MessageCircle, 
   Share2, 
   Bookmark, 
-  MoreHorizontal 
+  MoreHorizontal,
+  Volume2,
+  VolumeX
 } from "lucide-react";
 import { PostWithUser } from "@shared/schema";
 import { formatDistanceToNow } from "date-fns";
+import { useAccessibility } from "@/contexts/AccessibilityContext";
 
 interface PostCardProps {
   post: PostWithUser;
@@ -21,8 +24,15 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post, onLike, onComment, onShare, onBookmark }: PostCardProps) {
+  const { settings, speak, stopSpeaking, isSpeaking } = useAccessibility();
+  
   const getTimeAgo = (date: Date | string) => {
     return formatDistanceToNow(new Date(date), { addSuffix: true });
+  };
+
+  const handleReadPost = () => {
+    const postText = `${post.title ? post.title + '. ' : ''}${post.content}`;
+    speak(postText);
   };
 
   const renderPortfolioContent = () => {
@@ -145,6 +155,22 @@ export default function PostCard({ post, onLike, onComment, onShare, onBookmark 
               <Share2 className="h-4 w-4" />
               <span className="text-sm">Share</span>
             </Button>
+            
+            {settings.textToSpeech && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={isSpeaking ? stopSpeaking : handleReadPost}
+                className="flex items-center space-x-2 text-ink-600 hover:text-gold-600"
+              >
+                {isSpeaking ? (
+                  <VolumeX className="h-4 w-4" />
+                ) : (
+                  <Volume2 className="h-4 w-4" />
+                )}
+                <span className="text-sm">{isSpeaking ? 'Stop' : 'Read'}</span>
+              </Button>
+            )}
           </div>
           
           <Button

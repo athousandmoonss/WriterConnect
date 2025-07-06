@@ -118,7 +118,34 @@ The application uses a relational database with the following main entities:
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+### Accessibility Features Implementation (July 06, 2025)
+- **Accessibility Context**: Added comprehensive accessibility management with settings persistence
+- **Color Schemes**: Implemented four reading-friendly themes:
+  - High Contrast: Black and white for maximum readability
+  - Dyslexia Friendly: Cream background with blue accents and OpenDyslexic font
+  - Low Light: Dark theme with reduced eye strain
+  - Default: Standard ink and gold theme
+- **Text-to-Speech**: Full speech synthesis integration with:
+  - Configurable reading speed (0.5x to 2.0x)
+  - Voice type selection (default, male, female)
+  - Read buttons on individual posts
+  - Page-wide reading functionality
+- **Typography Options**: Variable font sizes (normal, large, extra large) and large text mode
+- **Accessibility Toolbar**: Fixed bottom-right quick access to all features
+- **Settings Page**: Dedicated /accessibility route with comprehensive controls
+- **CSS Framework**: Complete styling system for all accessibility modes
+- **Browser Compatibility**: Proper fallbacks and error handling for speech synthesis
+
+### Architecture Updates
+- Added `/contexts` directory for React context providers
+- Enhanced header navigation with accessibility settings link
+- Integrated accessibility features into existing post components
+- Added accessibility CSS classes and responsive design considerations
+
 ## Changelog
 
 Changelog:
 - July 06, 2025. Initial setup
+- July 06, 2025. Accessibility mode implementation with color schemes and text-to-speech

@@ -87,14 +87,20 @@ export function AccessibilityProvider({ children }: { children: ReactNode }) {
   const speak = (text: string) => {
     if (!settings.textToSpeech || !text.trim()) return;
     
+    // Check if speechSynthesis is available
+    if (typeof window === 'undefined' || !window.speechSynthesis) {
+      console.warn('Speech synthesis is not supported in this browser');
+      return;
+    }
+    
     // Cancel any ongoing speech
-    speechSynthesis.cancel();
+    window.speechSynthesis.cancel();
     
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = settings.readingSpeed;
     
     // Set voice based on preference
-    const voices = speechSynthesis.getVoices();
+    const voices = window.speechSynthesis.getVoices();
     if (voices.length > 0) {
       if (settings.voiceType === 'female') {
         const femaleVoice = voices.find(voice => voice.name.toLowerCase().includes('female') || voice.name.toLowerCase().includes('woman'));
@@ -109,11 +115,13 @@ export function AccessibilityProvider({ children }: { children: ReactNode }) {
     utterance.onend = () => setIsSpeaking(false);
     utterance.onerror = () => setIsSpeaking(false);
     
-    speechSynthesis.speak(utterance);
+    window.speechSynthesis.speak(utterance);
   };
 
   const stopSpeaking = () => {
-    speechSynthesis.cancel();
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
     setIsSpeaking(false);
   };
 

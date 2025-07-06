@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(24, 9.8%, 10%);
+  --muted: hsl(0, 0%, 96.1%);
+  --muted-foreground: hsl(0, 0%, 45.1%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(24, 9.8%, 10%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(24, 9.8%, 10%);
+  --border: hsl(0, 0%, 89.8%);
+  --input: hsl(0, 0%, 89.8%);
+  --primary: hsl(47, 77%, 63%);
+  --primary-foreground: hsl(0, 0%, 9%);
+  --secondary: hsl(0, 0%, 96.1%);
+  --secondary-foreground: hsl(0, 0%, 9%);
+  --accent: hsl(0, 0%, 96.1%);
+  --accent-foreground: hsl(0, 0%, 9%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(0, 0%, 3.9%);
+  --radius: 0.5rem;
+  
+  /* Custom ink and gold colors */
+  --ink-50: hsl(210, 40%, 99%);
+  --ink-100: hsl(210, 40%, 95%);
+  --ink-200: hsl(214, 32%, 91%);
+  --ink-300: hsl(213, 27%, 84%);
+  --ink-400: hsl(215, 20%, 65%);
+  --ink-500: hsl(215, 16%, 47%);
+  --ink-600: hsl(215, 19%, 35%);
+  --ink-700: hsl(215, 25%, 27%);
+  --ink-800: hsl(217, 33%, 17%);
+  --ink-900: hsl(222, 47%, 11%);
+  
+  --gold-400: hsl(45, 93%, 67%);
+  --gold-500: hsl(38, 92%, 50%);
+  --gold-600: hsl(32, 95%, 44%);
+}
+
+.dark {
+  --background: hsl(222, 47%, 11%);
+  --foreground: hsl(210, 40%, 99%);
+  --muted: hsl(217, 33%, 17%);
+  --muted-foreground: hsl(215, 20%, 65%);
+  --popover: hsl(222, 47%, 11%);
+  --popover-foreground: hsl(210, 40%, 99%);
+  --card: hsl(222, 47%, 11%);
+  --card-foreground: hsl(210, 40%, 99%);
+  --border: hsl(217, 33%, 17%);
+  --input: hsl(217, 33%, 17%);
+  --primary: hsl(47, 77%, 63%);
+  --primary-foreground: hsl(0, 0%, 9%);
+  --secondary: hsl(217, 33%, 17%);
+  --secondary-foreground: hsl(210, 40%, 99%);
+  --accent: hsl(217, 33%, 17%);
+  --accent-foreground: hsl(210, 40%, 99%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(210, 40%, 99%);
+  --ring: hsl(214, 32%, 91%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .text-ink-50 { color: var(--ink-50); }
+  .text-ink-100 { color: var(--ink-100); }
+  .text-ink-200 { color: var(--ink-200); }
+  .text-ink-300 { color: var(--ink-300); }
+  .text-ink-400 { color: var(--ink-400); }
+  .text-ink-500 { color: var(--ink-500); }
+  .text-ink-600 { color: var(--ink-600); }
+  .text-ink-700 { color: var(--ink-700); }
+  .text-ink-800 { color: var(--ink-800); }
+  .text-ink-900 { color: var(--ink-900); }
+  
+  .bg-ink-50 { background-color: var(--ink-50); }
+  .bg-ink-100 { background-color: var(--ink-100); }
+  .bg-ink-200 { background-color: var(--ink-200); }
+  .bg-ink-300 { background-color: var(--ink-300); }
+  .bg-ink-400 { background-color: var(--ink-400); }
+  .bg-ink-500 { background-color: var(--ink-500); }
+  .bg-ink-600 { background-color: var(--ink-600); }
+  .bg-ink-700 { background-color: var(--ink-700); }
+  .bg-ink-800 { background-color: var(--ink-800); }
+  .bg-ink-900 { background-color: var(--ink-900); }
+  
+  .text-gold-400 { color: var(--gold-400); }
+  .text-gold-500 { color: var(--gold-500); }
+  .text-gold-600 { color: var(--gold-600); }
+  
+  .bg-gold-50 { background-color: hsl(45, 93%, 97%); }
+  .bg-gold-100 { background-color: hsl(45, 93%, 87%); }
+  .bg-gold-400 { background-color: var(--gold-400); }
+  .bg-gold-500 { background-color: var(--gold-500); }
+  .bg-gold-600 { background-color: var(--gold-600); }
+  
+  .border-ink-200 { border-color: var(--ink-200); }
+  .border-ink-300 { border-color: var(--ink-300); }
+  
+  .hover\:text-gold-600:hover { color: var(--gold-600); }
+  .hover\:bg-gold-50:hover { background-color: hsl(45, 93%, 97%); }
+  .hover\:bg-gold-600:hover { background-color: var(--gold-600); }
+  
+  .focus\:ring-gold-500:focus { 
+    --tw-ring-color: var(--gold-500);
+  }
+  
+  .ring-gold-500 { 
+    --tw-ring-color: var(--gold-500);
+  }
+  
+  .font-playfair { font-family: 'Playfair Display', serif; }
+  .font-inter { font-family: 'Inter', sans-serif; }
+  .font-fira { font-family: 'Fira Code', monospace; }
+}
